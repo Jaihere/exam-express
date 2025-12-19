@@ -24,7 +24,7 @@ export const ReadingSection = () => {
 
   return (
     <div className="flex h-full animate-fade-in">
-      {/* Left Panel - PDF Upload */}
+      {/* Left Panel - PDF Upload & Preview */}
       <div className="w-1/2 border-r border-border bg-muted/20">
         <PDFUploader onFileSelect={setPdfFile} selectedFile={pdfFile} />
       </div>
@@ -37,13 +37,13 @@ export const ReadingSection = () => {
         </div>
         <ScrollArea className="h-[calc(100vh-180px)]">
           <div className="p-6 space-y-6">
-            {/* Multiple Choice Questions 1-5 */}
+            {/* Multiple Choice Questions 1-5 (A, B, C only) */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded">
                   Q1-5
                 </span>
-                <h3 className="font-semibold text-foreground">Multiple Choice (A, B, C, D)</h3>
+                <h3 className="font-semibold text-foreground">Multiple Choice (A, B, C)</h3>
               </div>
               
               <div className="grid grid-cols-1 gap-3">
@@ -55,7 +55,7 @@ export const ReadingSection = () => {
                       onValueChange={(value) => handleChange(`q${q}`, value)}
                       className="flex gap-4"
                     >
-                      {["A", "B", "C", "D"].map((option) => (
+                      {["A", "B", "C"].map((option) => (
                         <div key={option} className="flex items-center space-x-1">
                           <RadioGroupItem value={option} id={`q${q}-${option}`} />
                           <Label htmlFor={`q${q}-${option}`} className="cursor-pointer text-sm font-medium">
@@ -69,13 +69,13 @@ export const ReadingSection = () => {
               </div>
             </div>
 
-            {/* True/False/Not Given Questions 6-10 */}
+            {/* True/False Questions 6-10 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded">
                   Q6-10
                 </span>
-                <h3 className="font-semibold text-foreground">True / False / Not Given</h3>
+                <h3 className="font-semibold text-foreground">True / False</h3>
               </div>
               
               <div className="grid grid-cols-1 gap-3">
@@ -92,7 +92,6 @@ export const ReadingSection = () => {
                       <SelectContent className="bg-popover">
                         <SelectItem value="TRUE">TRUE</SelectItem>
                         <SelectItem value="FALSE">FALSE</SelectItem>
-                        <SelectItem value="NOT GIVEN">NOT GIVEN</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
