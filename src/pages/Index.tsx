@@ -1,12 +1,111 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useExamStore } from "@/store/examStore";
+import { ExamSidebar } from "@/components/ExamSidebar";
+import { ReadingSection } from "@/components/ReadingSection";
+import { ListeningSection } from "@/components/ListeningSection";
+import { WritingSection } from "@/components/WritingSection";
+import { ResultsSection } from "@/components/ResultsSection";
+import { Button } from "@/components/ui/button";
+import { Send, AlertCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Index = () => {
+  const { currentSection, submitExam, isSubmitted, answers } = useExamStore();
+
+  const countAnswered = () => {
+    const reading = Object.keys(answers.reading).filter((k) => answers.reading[k]).length;
+    const listening = Object.keys(answers.listening).filter((k) => answers.listening[k]).length;
+    const writing = Object.keys(answers.writing).filter((k) => answers.writing[k]).length;
+    return { reading, listening, writing, total: reading + listening + writing };
+  };
+
+  const answered = countAnswered();
+
+  const renderSection = () => {
+    switch (currentSection) {
+      case "reading":
+        return <ReadingSection />;
+      case "listening":
+        return <ListeningSection />;
+      case "writing":
+        return <WritingSection />;
+      case "results":
+        return <ResultsSection />;
+      default:
+        return <ReadingSection />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="flex h-screen w-full bg-background">
+      <ExamSidebar />
+      
+      <main className="flex-1 flex flex-col min-w-0">
+        {/* Main Content */}
+        <div className="flex-1 overflow-hidden">
+          {renderSection()}
+        </div>
+
+        {/* Submit Bar */}
+        {!isSubmitted && currentSection !== "results" && (
+          <div className="border-t border-border bg-card p-4">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{answered.total}/35</span> questions answered
+                <span className="mx-3 text-border">|</span>
+                <span>Reading: {answered.reading}/15</span>
+                <span className="mx-2">•</span>
+                <span>Listening: {answered.listening}/15</span>
+                <span className="mx-2">•</span>
+                <span>Writing: {answered.writing}/5</span>
+              </div>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Send className="h-4 w-4" />
+                    Submit Exam
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-card">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-warning" />
+                      Submit Exam?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You have answered {answered.total} out of 35 questions.
+                      {answered.total < 35 && (
+                        <span className="block mt-2 text-warning">
+                          Warning: You have {35 - answered.total} unanswered questions.
+                        </span>
+                      )}
+                      <span className="block mt-2">
+                        Once submitted, you cannot change your answers.
+                      </span>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continue Exam</AlertDialogCancel>
+                    <AlertDialogAction onClick={submitExam}>
+                      Submit Now
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
