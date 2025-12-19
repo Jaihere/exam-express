@@ -7,9 +7,9 @@ import { CheckCircle, XCircle, Trophy, RotateCcw, BookOpen, Headphones, PenTool 
 import { cn } from "@/lib/utils";
 
 export const ResultsSection = () => {
-  const { answers, resetExam } = useExamStore();
+  const { answers, resetExam, answerKey } = useExamStore();
 
-  const results: GradingResult = useMemo(() => gradeExam(answers), [answers]);
+  const results: GradingResult = useMemo(() => gradeExam(answers, answerKey), [answers, answerKey]);
 
   const getGradeColor = (percentage: number) => {
     if (percentage >= 80) return "text-success";
@@ -71,10 +71,10 @@ export const ResultsSection = () => {
               {results.percentage >= 80
                 ? "Excellent! Outstanding performance!"
                 : results.percentage >= 60
-                ? "Good job! You passed the exam."
-                : results.percentage >= 40
-                ? "You can do better. Keep practicing!"
-                : "Needs improvement. Review the material."}
+                  ? "Good job! You passed the exam."
+                  : results.percentage >= 40
+                    ? "You can do better. Keep practicing!"
+                    : "Needs improvement. Review the material."}
             </p>
           </div>
 

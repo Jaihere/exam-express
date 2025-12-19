@@ -39,15 +39,15 @@ const countWords = (text: string): number => {
     .filter((word) => word.length > 0).length;
 };
 
-export const gradeExam = (answers: ExamAnswers): GradingResult => {
+export const gradeExam = (answers: ExamAnswers, key: typeof answerKey): GradingResult => {
   // Grade Reading Section
   const readingDetails: QuestionResult[] = [];
   let readingScore = 0;
 
   for (let i = 1; i <= 15; i++) {
-    const key = `q${i}` as keyof typeof answerKey.reading;
-    const userAnswer = answers.reading[key] || "";
-    const correctAnswer = answerKey.reading[key];
+    const qKey = `q${i}` as keyof typeof key.reading;
+    const userAnswer = answers.reading[qKey] || "";
+    const correctAnswer = key.reading[qKey];
     const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) readingScore++;
@@ -65,9 +65,9 @@ export const gradeExam = (answers: ExamAnswers): GradingResult => {
   let listeningScore = 0;
 
   for (let i = 1; i <= 15; i++) {
-    const key = `q${i}` as keyof typeof answerKey.listening;
-    const userAnswer = answers.listening[key] || "";
-    const correctAnswer = answerKey.listening[key];
+    const qKey = `q${i}` as keyof typeof key.listening;
+    const userAnswer = answers.listening[qKey] || "";
+    const correctAnswer = key.listening[qKey];
     const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) listeningScore++;
@@ -80,22 +80,22 @@ export const gradeExam = (answers: ExamAnswers): GradingResult => {
     });
   }
 
-  // Grade Writing Section (word count based)
+  // Grade Writing Section (exact match)
   const writingDetails: QuestionResult[] = [];
   let writingScore = 0;
 
   for (let i = 1; i <= 5; i++) {
-    const key = `q${i}`;
-    const userAnswer = answers.writing[key] || "";
-    const wordCount = countWords(userAnswer);
-    const isCorrect = wordCount >= answerKey.writing.minWordCount;
+    const qKey = `q${i}` as keyof typeof key.writing;
+    const userAnswer = answers.writing[qKey] || "";
+    const correctAnswer = key.writing[qKey];
+    const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) writingScore++;
 
     writingDetails.push({
       question: `Q${i}`,
-      userAnswer: userAnswer ? `${wordCount} words` : "(No answer)",
-      correctAnswer: `≥${answerKey.writing.minWordCount} words`,
+      userAnswer: userAnswer || "(No answer)",
+      correctAnswer,
       isCorrect,
     });
   }

@@ -22,7 +22,7 @@ export const ExamSidebar = () => {
     >
       {/* Header */}
       <div className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center justify-between">
+        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
           {!isCollapsed && (
             <div className="animate-fade-in">
               <h1 className="text-lg font-bold">Exam Portal</h1>
@@ -52,7 +52,8 @@ export const ExamSidebar = () => {
             className={cn(
               "sidebar-nav-item w-full text-left",
               currentSection === item.id && "sidebar-nav-item-active",
-              isSubmitted && "opacity-50 cursor-not-allowed"
+              isSubmitted && "opacity-50 cursor-not-allowed",
+              isCollapsed && "justify-center"
             )}
             style={{ animationDelay: `${index * 50}ms` }}
           >
@@ -68,7 +69,8 @@ export const ExamSidebar = () => {
               onClick={() => setSection("results")}
               className={cn(
                 "sidebar-nav-item w-full text-left",
-                currentSection === "results" && "sidebar-nav-item-active"
+                currentSection === "results" && "sidebar-nav-item-active",
+                isCollapsed && "justify-center"
               )}
             >
               <Trophy className={cn("h-5 w-5 flex-shrink-0", currentSection === "results" && "text-sidebar-primary")} />
@@ -81,8 +83,13 @@ export const ExamSidebar = () => {
       {/* Footer */}
       <div className={cn("p-4 border-t border-sidebar-border", isCollapsed && "hidden")}>
         <div className="text-xs text-sidebar-foreground/60">
-          <p>Total Questions: 35</p>
-          <p className="mt-1">Time: Self-paced</p>
+          <p>Copyright &copy; 2025<br />Developed by Jay Vagadiya</p>
+          <button
+            onClick={() => setSection("admin")}
+            className="mt-4 text-[10px] hover:text-primary transition-colors opacity-50 hover:opacity-100"
+          >
+            Admin Panel
+          </button>
         </div>
       </div>
     </aside>

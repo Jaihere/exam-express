@@ -4,6 +4,7 @@ import { ReadingSection } from "@/components/ReadingSection";
 import { ListeningSection } from "@/components/ListeningSection";
 import { WritingSection } from "@/components/WritingSection";
 import { ResultsSection } from "@/components/ResultsSection";
+import { AdminPanel } from "@/components/AdminPanel";
 import { Button } from "@/components/ui/button";
 import { Send, AlertCircle } from "lucide-react";
 import {
@@ -40,6 +41,8 @@ const Index = () => {
         return <WritingSection />;
       case "results":
         return <ResultsSection />;
+      case "admin":
+        return <AdminPanel />;
       default:
         return <ReadingSection />;
     }
@@ -48,7 +51,7 @@ const Index = () => {
   return (
     <div className="flex h-screen w-full bg-background">
       <ExamSidebar />
-      
+
       <main className="flex-1 flex flex-col min-w-0">
         {/* Main Content */}
         <div className="flex-1 overflow-hidden">
@@ -68,7 +71,7 @@ const Index = () => {
                 <span className="mx-2">•</span>
                 <span>Writing: {answered.writing}/5</span>
               </div>
-              
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button className="gap-2">

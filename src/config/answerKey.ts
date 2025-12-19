@@ -41,18 +41,15 @@ export const answerKey = {
     q15: "D",
   },
   writing: {
-    // Minimum word count for each question to earn a point
-    minWordCount: 20,
     // Model answers for reference (optional comparison)
-    modelAnswers: {
-      q1: "The main advantage of renewable energy is its sustainability and reduced environmental impact.",
-      q2: "Technology has transformed education by enabling remote learning and access to global resources.",
-      q3: "Urban planning should prioritize green spaces to improve residents' mental and physical health.",
-      q4: "Effective communication requires active listening, clarity of expression, and empathy.",
-      q5: "Climate change mitigation requires both individual actions and governmental policies working together.",
-    },
+    q1: "Jay",
+    q2: "Jay",
+    q3: "Jay",
+    q4: "Jay",
+    q5: "Jay",
   },
 };
 
 export type ReadingAnswers = typeof answerKey.reading;
 export type ListeningAnswers = typeof answerKey.listening;
+export type WritingAnswers = typeof answerKey.writing;
