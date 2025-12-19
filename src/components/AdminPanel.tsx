@@ -16,7 +16,7 @@ export const AdminPanel = () => {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (password === "admin123") {
+        if (password === "K1AFTpSGQGYyiinh") {
             setIsAuthenticated(true);
         } else {
             alert("Incorrect password");
