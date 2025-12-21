@@ -43,14 +43,14 @@ export const WritingSection = () => {
                         Q{id}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        Short Answer
+                        Answer
                       </span>
                     </div>
 
                     <Input
                       value={answer}
                       onChange={(e) => handleChange(`q${id}`, e.target.value)}
-                      placeholder="Type your 3-4 word answer here..."
+                      placeholder="Type your answer here..."
                       className="bg-background"
                     />
                   </div>
