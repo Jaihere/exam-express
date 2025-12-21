@@ -95,45 +95,49 @@ export const AdminResultView = ({ user, onBack }: AdminResultViewProps) => {
                 </ScrollArea>
             </div>
 
-            {/* PRINT VIEW (Isolated) */}
-            <div className="hidden print:block p-0 m-0 w-full h-auto">
-                <div className="space-y-4">
-                    <div className="text-center border-b pb-2 mb-4">
-                        <h1 className="text-xl font-bold mb-1">Exam Result Report</h1>
-                        <div className="flex justify-center gap-4 text-sm">
-                            <p><strong>Student:</strong> {user.username}</p>
-                            <p><strong>Date:</strong> {new Date(user.results?.date || "").toLocaleDateString()}</p>
-                            <p><strong>Total Score:</strong> {results.totalScore} / {results.totalQuestions} ({results.percentage}%)</p>
+            {/* PRINT VIEW (Isolated & Compact) */}
+            <div className="hidden print:block p-0 m-0 w-full h-auto text-[10px] leading-tight">
+                <div className="border-b border-black pb-1 mb-2">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-sm font-bold uppercase tracking-wider">Exam Results</h1>
+                        <div className="flex gap-4">
+                            <span><strong>Student:</strong> {user.username}</span>
+                            <span><strong>Date:</strong> {new Date(user.results?.date || "").toLocaleDateString()}</span>
+                            <span><strong>Score:</strong> {results.totalScore}/{results.totalQuestions} ({results.percentage}%)</span>
                         </div>
                     </div>
+                </div>
 
-                    <div className="grid grid-cols-3 gap-4 items-start">
-                        {(["reading", "listening", "writing"] as const).map((section) => {
-                            const sectionData = results[section];
-                            if (!sectionData) return null;
-                            return (
-                                <div key={section} className="space-y-2 break-inside-avoid">
-                                    <h2 className="text-lg font-bold mb-2 capitalize border-b border-black pb-1">
-                                        {section} ({sectionData.score}/{sectionData.total})
-                                    </h2>
-                                    <div className="space-y-2">
-                                        {sectionData.details.map((detail, idx) => (
-                                            <div key={idx} className="border-b pb-2 text-xs">
-                                                <div className="flex items-center gap-2 mb-1">
+                <div className="grid grid-cols-3 gap-2 items-start">
+                    {(["reading", "listening", "writing"] as const).map((section) => {
+                        const sectionData = results[section];
+                        if (!sectionData) return null;
+                        return (
+                            <div key={section} className="break-inside-avoid">
+                                <h2 className="font-bold mb-1 uppercase text-[11px] border-b border-gray-300 pb-0.5">
+                                    {section} ({sectionData.score}/{sectionData.total})
+                                </h2>
+                                <div className="space-y-0.5">
+                                    {sectionData.details.map((detail, idx) => (
+                                        <div key={idx} className="border-b border-gray-100 py-0.5">
+                                            <div className="flex items-start gap-1.5">
+                                                <div className="mt-0.5 shrink-0">
                                                     {detail.isCorrect ? <span className="text-green-600 font-bold">✓</span> : <span className="text-red-600 font-bold">✗</span>}
-                                                    <span className="font-semibold">{detail.question}</span>
                                                 </div>
-                                                <div className="pl-4">
-                                                    <div className={cn(!detail.isCorrect && "line-through text-gray-500")}>Your: {detail.userAnswer}</div>
-                                                    {!detail.isCorrect && <div className="font-bold">Correct: {detail.correctAnswer}</div>}
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-semibold truncate">{detail.question}</div>
+                                                    <div className="flex flex-wrap gap-x-2 text-[9px] text-gray-600">
+                                                        <span className={cn(!detail.isCorrect && "line-through opacity-70")}>Ans: {detail.userAnswer}</span>
+                                                        {!detail.isCorrect && <span className="font-bold text-black bg-gray-100 px-1 rounded-sm">Correct: {detail.correctAnswer}</span>}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            );
-                        })}
-                    </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
