@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useExamStore } from "@/store/examStore";
 import { useUserStore } from "@/store/userStore";
 import { AdminResultView } from "./AdminResultView";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 
 export const AdminPanel = () => {
     const { answerKey, updateAnswerKey } = useExamStore();
-    const { users, addUser, deleteUser, logout } = useUserStore();
+    const { users, addUser, deleteUser, logout, fetchUsers, isLoading } = useUserStore();
     const [localKey, setLocalKey] = useState(answerKey);
     const [isDirty, setIsDirty] = useState(false);
 
@@ -28,6 +28,10 @@ export const AdminPanel = () => {
     const [newUserUser, setNewUserUser] = useState("");
     const [newUserPass, setNewUserPass] = useState("");
     const [selectedUserForDetails, setSelectedUserForDetails] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
     const handleUpdate = (
         section: "reading" | "listening" | "writing",
@@ -55,10 +59,10 @@ export const AdminPanel = () => {
         setIsDirty(false);
     };
 
-    const handleAddUser = (e: React.FormEvent) => {
+    const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newUserUser || !newUserPass) return;
-        addUser({
+        await addUser({
             username: newUserUser,
             password: newUserPass,
             isCompleted: false

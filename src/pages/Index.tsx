@@ -108,14 +108,17 @@ const Index = () => {
                       const result = gradeExam(answers, useExamStore.getState().answerKey);
 
                       if (currentUser && currentUser.username !== "admin") {
-                        saveResult(currentUser.username, {
-                          reading: result.reading.score,
-                          listening: result.listening.score,
-                          writing: result.writing.score,
-                          total: result.totalScore,
-                          date: new Date().toISOString()
-                        }, answers);
-                        toast.success("Exam submitted and results saved!");
+                        // Make async
+                        (async () => {
+                          await saveResult(currentUser.username, {
+                            reading: result.reading.score,
+                            listening: result.listening.score,
+                            writing: result.writing.score,
+                            total: result.totalScore,
+                            date: new Date().toISOString()
+                          }, answers);
+                          // Toaster handled in store
+                        })();
                       } else {
                         toast.warning("Results not saved (Admin or Guest mode)");
                       }

@@ -9,11 +9,11 @@ import { toast } from "sonner";
 
 const Login = () => {
     const navigate = useNavigate();
-    const { login } = useUserStore();
+    const { login, isLoading } = useUserStore();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!username) {
@@ -21,7 +21,7 @@ const Login = () => {
             return;
         }
 
-        const success = login(username, password);
+        const success = await login(username, password);
         if (success) {
             toast.success("Welcome back!");
             navigate("/");
@@ -46,6 +46,7 @@ const Login = () => {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 autoFocus
+                                disabled={isLoading}
                             />
                         </div>
                         <div className="space-y-2">
@@ -57,11 +58,12 @@ const Login = () => {
                                     className="pl-9"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    disabled={isLoading}
                                 />
                             </div>
                         </div>
-                        <Button type="submit" className="w-full">
-                            Login
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
                 </CardContent>
