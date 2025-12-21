@@ -1,4 +1,6 @@
 import { useExamStore } from "@/store/examStore";
+import { useUserStore } from "@/store/userStore";
+import { gradeExam } from "@/lib/gradingEngine";
 import { ExamSidebar } from "@/components/ExamSidebar";
 import { ReadingSection } from "@/components/ReadingSection";
 import { ListeningSection } from "@/components/ListeningSection";
@@ -18,9 +20,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const Index = () => {
-  const { currentSection, submitExam, isSubmitted, answers } = useExamStore();
+  const { currentSection, submitExam, isSubmitted, answers, setSection } = useExamStore();
+  const { currentUser, saveResult } = useUserStore();
 
   const countAnswered = () => {
     const reading = Object.keys(answers.reading).filter((k) => answers.reading[k]).length;
@@ -99,7 +103,23 @@ const Index = () => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Continue Exam</AlertDialogCancel>
-                    <AlertDialogAction onClick={submitExam}>
+                    <AlertDialogAction onClick={() => {
+                      submitExam();
+                      const result = gradeExam(answers, useExamStore.getState().answerKey);
+
+                      if (currentUser && currentUser.username !== "admin") {
+                        saveResult(currentUser.username, {
+                          reading: result.reading.score,
+                          listening: result.listening.score,
+                          writing: result.writing.score,
+                          total: result.totalScore,
+                          date: new Date().toISOString()
+                        });
+                        toast.success("Exam submitted and results saved!");
+                      } else {
+                        toast.warning("Results not saved (Admin or Guest mode)");
+                      }
+                    }}>
                       Submit Now
                     </AlertDialogAction>
                   </AlertDialogFooter>

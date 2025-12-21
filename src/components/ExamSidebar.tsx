@@ -1,6 +1,7 @@
 import { BookOpen, Headphones, PenTool, Trophy, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useExamStore } from "@/store/examStore";
+import { useUserStore } from "@/store/userStore";
 import { useState } from "react";
 
 const navItems = [
@@ -11,6 +12,7 @@ const navItems = [
 
 export const ExamSidebar = () => {
   const { currentSection, setSection, isSubmitted } = useExamStore();
+  const { isAdmin, logout } = useUserStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -84,11 +86,19 @@ export const ExamSidebar = () => {
       <div className={cn("p-4 border-t border-sidebar-border", isCollapsed && "hidden")}>
         <div className="text-xs text-sidebar-foreground/60">
           <p>Copyright &copy; 2025<br />Developed by Jay Vagadiya</p>
+          {isAdmin && (
+            <button
+              onClick={() => setSection("admin")}
+              className="mt-4 text-[10px] w-full text-left font-bold text-primary hover:text-primary/80 transition-colors"
+            >
+              Admin Panel
+            </button>
+          )}
           <button
-            onClick={() => setSection("admin")}
-            className="mt-4 text-[10px] hover:text-primary transition-colors opacity-50 hover:opacity-100"
+            onClick={logout}
+            className="mt-2 text-[10px] w-full text-left hover:text-destructive transition-colors"
           >
-            Admin Panel
+            Logout
           </button>
         </div>
       </div>
