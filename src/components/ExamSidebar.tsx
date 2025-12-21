@@ -17,6 +17,7 @@ export const ExamSidebar = () => {
 
   return (
     <aside
+      id="app-sidebar"
       className={cn(
         "bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 border-r border-sidebar-border",
         isCollapsed ? "w-16" : "w-64"

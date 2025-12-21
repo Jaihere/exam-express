@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useExamStore } from "@/store/examStore";
 import { useUserStore } from "@/store/userStore";
+import { AdminResultView } from "./AdminResultView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ export const AdminPanel = () => {
     // New User Form State
     const [newUserUser, setNewUserUser] = useState("");
     const [newUserPass, setNewUserPass] = useState("");
+    const [selectedUserForDetails, setSelectedUserForDetails] = useState<string | null>(null);
 
     const handleUpdate = (
         section: "reading" | "listening" | "writing",
@@ -65,10 +67,17 @@ export const AdminPanel = () => {
         setNewUserPass("");
     };
 
+    const selectedUserObj = users.find(u => u.username === selectedUserForDetails);
+
+    if (selectedUserForDetails && selectedUserObj) {
+        return <AdminResultView user={selectedUserObj} onBack={() => setSelectedUserForDetails(null)} />;
+    }
+
     return (
         <div className="flex flex-col h-full animate-fade-in">
-            {/* Header */}
+            {/* ... Header ... */}
             <div className="p-6 border-b border-border bg-card flex items-center justify-between">
+                {/* ... same header ... */}
                 <div>
                     <h2 className="section-header mb-0">Admin Panel</h2>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -84,14 +93,18 @@ export const AdminPanel = () => {
 
             <ScrollArea className="flex-1">
                 <div className="p-6 max-w-5xl mx-auto">
+                    {/* ... Tabs ... */}
                     <Tabs defaultValue="users" className="w-full">
+                        {/* ... TabList ... */}
                         <TabsList className="grid w-full grid-cols-3 mb-8">
                             <TabsTrigger value="users">User Management</TabsTrigger>
                             <TabsTrigger value="results">Exam Results</TabsTrigger>
                             <TabsTrigger value="keys">Answer Key</TabsTrigger>
                         </TabsList>
 
+                        {/* ... Users Tab ... */}
                         <TabsContent value="users" className="space-y-6">
+                            {/* ... (keep user management content same, I will use a larger block to ensure context matches) ... */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="text-lg flex items-center gap-2">
@@ -173,6 +186,7 @@ export const AdminPanel = () => {
                             </Card>
                         </TabsContent>
 
+                        {/* RESULTS TAB */}
                         <TabsContent value="results" className="space-y-6">
                             <Card>
                                 <CardHeader>
@@ -191,12 +205,13 @@ export const AdminPanel = () => {
                                                 <TableHead>Listening</TableHead>
                                                 <TableHead>Writing</TableHead>
                                                 <TableHead className="text-right">Total Score</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {users.filter(u => u.isCompleted && u.results).length === 0 && (
                                                 <TableRow>
-                                                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                                                         No results available.
                                                     </TableCell>
                                                 </TableRow>
@@ -213,6 +228,11 @@ export const AdminPanel = () => {
                                                         <TableCell className="text-right font-bold text-primary">
                                                             {user.results?.total}/35
                                                         </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <Button size="sm" variant="outline" onClick={() => setSelectedUserForDetails(user.username)}>
+                                                                View Details
+                                                            </Button>
+                                                        </TableCell>
                                                     </TableRow>
                                                 ))}
                                         </TableBody>
@@ -221,6 +241,7 @@ export const AdminPanel = () => {
                             </Card>
                         </TabsContent>
 
+                        {/* KEYS TAB */}
                         <TabsContent value="keys" className="space-y-4">
                             <div className="flex justify-end gap-2 mb-4">
                                 <Button variant="outline" onClick={handleReset} disabled={!isDirty}>

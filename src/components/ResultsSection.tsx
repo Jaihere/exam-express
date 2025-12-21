@@ -1,4 +1,5 @@
 import { useExamStore } from "@/store/examStore";
+import { useUserStore } from "@/store/userStore";
 import { gradeExam, GradingResult } from "@/lib/gradingEngine";
 import { useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export const ResultsSection = () => {
   const { answers, resetExam, answerKey } = useExamStore();
+  const { isAdmin } = useUserStore();
 
   const results: GradingResult = useMemo(() => gradeExam(answers, answerKey), [answers, answerKey]);
 
@@ -30,6 +32,25 @@ export const ResultsSection = () => {
     listening: Headphones,
     writing: PenTool,
   };
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col h-full animate-fade-in items-center justify-center p-6 text-center">
+        <div className="bg-primary/10 p-6 rounded-full mb-6 animate-scale-in">
+          <CheckCircle className="h-16 w-16 text-primary" />
+        </div>
+        <h2 className="text-3xl font-bold mb-4">Exam Completed!</h2>
+        <p className="text-muted-foreground text-lg max-w-md mx-auto mb-8">
+          Thank you for completing the exam. Your answers have been submitted successfully.
+          Please contact the administrator for your results.
+        </p>
+        <Button onClick={resetExam} variant="outline" className="gap-2">
+          <RotateCcw className="h-4 w-4" />
+          Return to Start
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
@@ -103,45 +124,47 @@ export const ResultsSection = () => {
           </div>
 
           {/* Detailed Results */}
-          {(["reading", "listening", "writing"] as const).map((section) => {
-            const sectionData = results[section];
-            const Icon = sectionIcons[section];
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {(["reading", "listening", "writing"] as const).map((section) => {
+              const sectionData = results[section];
+              const Icon = sectionIcons[section];
 
-            return (
-              <div key={section} className="space-y-3">
-                <h3 className="font-semibold text-lg capitalize flex items-center gap-2 text-foreground">
-                  <Icon className="h-5 w-5 text-primary" />
-                  {section} Section Details
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {sectionData.details.map((detail, index) => (
-                    <div
-                      key={index}
-                      className={cn(
-                        "p-3 rounded-lg border flex items-start gap-3 transition-all",
-                        detail.isCorrect ? "result-correct" : "result-incorrect"
-                      )}
-                    >
-                      {detail.isCorrect ? (
-                        <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                      ) : (
-                        <XCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium">{detail.question}</p>
-                        <p className="text-xs truncate">Your: {detail.userAnswer}</p>
-                        {!detail.isCorrect && (
-                          <p className="text-xs truncate font-medium">
-                            Correct: {detail.correctAnswer}
-                          </p>
+              return (
+                <div key={section} className="space-y-3">
+                  <h3 className="font-semibold text-lg capitalize flex items-center gap-2 text-foreground">
+                    <Icon className="h-5 w-5 text-primary" />
+                    {section} Details
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {sectionData.details.map((detail, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "p-3 rounded-lg border flex items-start gap-3 transition-all",
+                          detail.isCorrect ? "result-correct" : "result-incorrect"
                         )}
+                      >
+                        {detail.isCorrect ? (
+                          <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <XCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{detail.question}</p>
+                          <p className="text-xs truncate">Your: {detail.userAnswer}</p>
+                          {!detail.isCorrect && (
+                            <p className="text-xs truncate font-medium">
+                              Correct: {detail.correctAnswer}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </ScrollArea>
     </div>

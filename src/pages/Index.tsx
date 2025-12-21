@@ -53,12 +53,12 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div id="app-wrapper" className="flex h-screen w-full bg-background">
       <ExamSidebar />
 
-      <main className="flex-1 flex flex-col min-w-0">
+      <main id="app-main" className="flex-1 flex flex-col min-w-0">
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
+        <div id="app-content-area" className="flex-1 overflow-hidden">
           {renderSection()}
         </div>
 
@@ -114,7 +114,7 @@ const Index = () => {
                           writing: result.writing.score,
                           total: result.totalScore,
                           date: new Date().toISOString()
-                        });
+                        }, answers);
                         toast.success("Exam submitted and results saved!");
                       } else {
                         toast.warning("Results not saved (Admin or Guest mode)");

@@ -12,6 +12,7 @@ export interface User {
         writing: number;
         total: number;
         date: string;
+        answers?: ExamAnswers;
     };
     isCompleted: boolean;
 }
@@ -25,7 +26,7 @@ interface UserState {
     logout: () => void;
     addUser: (user: User) => void;
     deleteUser: (username: string) => void;
-    saveResult: (username: string, result: User["results"]) => void;
+    saveResult: (username: string, result: User["results"], answers: ExamAnswers) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -87,17 +88,18 @@ export const useUserStore = create<UserState>()(
                 toast.success("User deleted");
             },
 
-            saveResult: (username, result) => {
+            saveResult: (username, result, answers) => {
+                const resultWithAnswers = { ...result, answers };
                 set((state) => ({
                     users: state.users.map((u) =>
                         u.username === username
-                            ? { ...u, results: result, isCompleted: true }
+                            ? { ...u, results: resultWithAnswers, isCompleted: true }
                             : u
                     ),
                     // Also update current user if it's them
                     currentUser:
                         state.currentUser?.username === username
-                            ? { ...state.currentUser, results: result, isCompleted: true }
+                            ? { ...state.currentUser, results: resultWithAnswers, isCompleted: true }
                             : state.currentUser,
                 }));
             },
