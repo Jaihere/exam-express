@@ -40,73 +40,85 @@ const countWords = (text: string): number => {
 };
 
 export const gradeExam = (answers: ExamAnswers, key: typeof answerKey): GradingResult => {
+  // Helper to sort keys naturally (q1, q2, q10)
+  const sortKeys = (keys: string[]) => {
+    return keys.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, '')) || 0;
+      const numB = parseInt(b.replace(/\D/g, '')) || 0;
+      return numA - numB;
+    });
+  };
+
   // Grade Reading Section
   const readingDetails: QuestionResult[] = [];
   let readingScore = 0;
+  const readingKeys = sortKeys(Object.keys(key.reading));
 
-  for (let i = 1; i <= 15; i++) {
-    const qKey = `q${i}` as keyof typeof key.reading;
-    const userAnswer = answers.reading[qKey] || "";
-    const correctAnswer = key.reading[qKey];
+  readingKeys.forEach((qKey) => {
+    const qNum = qKey.replace(/\D/g, ''); // Extract number for display
+    const userAnswer = answers.reading[qKey as keyof typeof key.reading] || "";
+    const correctAnswer = key.reading[qKey as keyof typeof key.reading];
     const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) readingScore++;
 
     readingDetails.push({
-      question: `Q${i}`,
+      question: `Q${qNum}`,
       userAnswer: userAnswer || "(No answer)",
       correctAnswer,
       isCorrect,
     });
-  }
+  });
 
   // Grade Listening Section
   const listeningDetails: QuestionResult[] = [];
   let listeningScore = 0;
+  const listeningKeys = sortKeys(Object.keys(key.listening));
 
-  for (let i = 1; i <= 15; i++) {
-    const qKey = `q${i}` as keyof typeof key.listening;
-    const userAnswer = answers.listening[qKey] || "";
-    const correctAnswer = key.listening[qKey];
+  listeningKeys.forEach((qKey) => {
+    const qNum = qKey.replace(/\D/g, '');
+    const userAnswer = answers.listening[qKey as keyof typeof key.listening] || "";
+    const correctAnswer = key.listening[qKey as keyof typeof key.listening];
     const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) listeningScore++;
 
     listeningDetails.push({
-      question: `Q${i}`,
+      question: `Q${qNum}`,
       userAnswer: userAnswer || "(No answer)",
       correctAnswer,
       isCorrect,
     });
-  }
+  });
 
-  // Grade Writing Section (exact match)
+  // Grade Writing Section
   const writingDetails: QuestionResult[] = [];
   let writingScore = 0;
+  const writingKeys = sortKeys(Object.keys(key.writing));
 
-  for (let i = 1; i <= 5; i++) {
-    const qKey = `q${i}` as keyof typeof key.writing;
-    const userAnswer = answers.writing[qKey] || "";
-    const correctAnswer = key.writing[qKey];
+  writingKeys.forEach((qKey) => {
+    const qNum = qKey.replace(/\D/g, '');
+    const userAnswer = answers.writing[qKey as keyof typeof key.writing] || "";
+    const correctAnswer = key.writing[qKey as keyof typeof key.writing];
     const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
 
     if (isCorrect) writingScore++;
 
     writingDetails.push({
-      question: `Q${i}`,
+      question: `Q${qNum}`,
       userAnswer: userAnswer || "(No answer)",
       correctAnswer,
       isCorrect,
     });
-  }
+  });
 
   const totalScore = readingScore + listeningScore + writingScore;
-  const totalQuestions = 35;
+  const totalQuestions = readingKeys.length + listeningKeys.length + writingKeys.length;
 
   return {
-    reading: { score: readingScore, total: 15, details: readingDetails },
-    listening: { score: listeningScore, total: 15, details: listeningDetails },
-    writing: { score: writingScore, total: 5, details: writingDetails },
+    reading: { score: readingScore, total: readingKeys.length, details: readingDetails },
+    listening: { score: listeningScore, total: listeningKeys.length, details: listeningDetails },
+    writing: { score: writingScore, total: writingKeys.length, details: writingDetails },
     totalScore,
     totalQuestions,
     percentage: Math.round((totalScore / totalQuestions) * 100),

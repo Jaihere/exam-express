@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Save, RefreshCw, Trash, UserPlus, FileSpreadsheet } from "lucide-react";
+import { gradeExam } from "@/lib/gradingEngine";
 import {
     Table,
     TableBody,
@@ -19,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export const AdminPanel = () => {
-    const { answerKey, updateAnswerKey } = useExamStore();
+    const { answerKey, updateAnswerKey, examPdfUrl, setExamPdfUrl } = useExamStore();
     const { users, addUser, deleteUser, logout, fetchUsers, isLoading } = useUserStore();
     const [localKey, setLocalKey] = useState(answerKey);
     const [isDirty, setIsDirty] = useState(false);
@@ -32,6 +33,19 @@ export const AdminPanel = () => {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    // Sync local state with store when fetched
+    useEffect(() => {
+        setLocalKey(answerKey);
+    }, [answerKey]);
+
+    const sortKeys = (keys: string[]) => {
+        return keys.sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.replace(/\D/g, '')) || 0;
+            return numA - numB;
+        });
+    };
 
     const handleUpdate = (
         section: "reading" | "listening" | "writing",
@@ -48,10 +62,17 @@ export const AdminPanel = () => {
         setIsDirty(true);
     };
 
-    const handleSave = () => {
-        updateAnswerKey(localKey);
-        setIsDirty(false);
-        toast.success("Answer Key Updated Successfully!");
+    const handleSave = async () => {
+        const promise = updateAnswerKey(localKey);
+
+        toast.promise(promise, {
+            loading: 'Saving answer key...',
+            success: () => {
+                setIsDirty(false);
+                return 'Answer Key Updated Successfully!';
+            },
+            error: 'Failed to save answer key',
+        });
     };
 
     const handleReset = () => {
@@ -70,6 +91,7 @@ export const AdminPanel = () => {
         setNewUserUser("");
         setNewUserPass("");
     };
+
 
     const selectedUserObj = users.find(u => u.username === selectedUserForDetails);
 
@@ -226,11 +248,11 @@ export const AdminPanel = () => {
                                                     <TableRow key={user.username}>
                                                         <TableCell className="font-medium">{user.username}</TableCell>
                                                         <TableCell>{user.results?.date ? new Date(user.results.date).toLocaleDateString() : "-"}</TableCell>
-                                                        <TableCell>{user.results?.reading}/15</TableCell>
-                                                        <TableCell>{user.results?.listening}/15</TableCell>
-                                                        <TableCell>{user.results?.writing}/5</TableCell>
+                                                        <TableCell>{user.results?.answers ? gradeExam(user.results.answers, answerKey).reading.score : user.results?.reading}/15</TableCell>
+                                                        <TableCell>{user.results?.answers ? gradeExam(user.results.answers, answerKey).listening.score : user.results?.listening}/15</TableCell>
+                                                        <TableCell>{user.results?.answers ? gradeExam(user.results.answers, answerKey).writing.score : user.results?.writing}/5</TableCell>
                                                         <TableCell className="text-right font-bold text-primary">
-                                                            {user.results?.total}/35
+                                                            {user.results?.answers ? gradeExam(user.results.answers, answerKey).totalScore : user.results?.total}/35
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <Button size="sm" variant="outline" onClick={() => setSelectedUserForDetails(user.username)}>
@@ -266,37 +288,44 @@ export const AdminPanel = () => {
                                 </TabsList>
                                 <TabsContent value="reading" className="mt-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {Object.entries(localKey.reading).map(([key, value]) => (
-                                            <div key={key} className="space-y-2">
-                                                <label className="text-sm font-medium capitalize">
-                                                    {key.replace("q", "Question ")}
-                                                </label>
-                                                <Input
-                                                    value={value}
-                                                    onChange={(e) => handleUpdate("reading", key, e.target.value)}
-                                                />
-                                            </div>
-                                        ))}
+                                        {sortKeys(Object.keys(localKey.reading)).map((key) => {
+                                            const value = localKey.reading[key];
+                                            return (
+                                                <div key={key} className="space-y-2">
+                                                    <label className="text-sm font-medium capitalize">
+                                                        {key.replace("q", "Question ")}
+                                                    </label>
+                                                    <Input
+                                                        value={value}
+                                                        onChange={(e) => handleUpdate("reading", key, e.target.value)}
+                                                    />
+                                                </div>
+                                            )
+                                        })}
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="listening" className="mt-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {Object.entries(localKey.listening).map(([key, value]) => (
-                                            <div key={key} className="space-y-2">
-                                                <label className="text-sm font-medium capitalize">
-                                                    {key.replace("q", "Question ")}
-                                                </label>
-                                                <Input
-                                                    value={value}
-                                                    onChange={(e) => handleUpdate("listening", key, e.target.value)}
-                                                />
-                                            </div>
-                                        ))}
+                                        {sortKeys(Object.keys(localKey.listening)).map((key) => {
+                                            const value = localKey.listening[key];
+                                            return (
+                                                <div key={key} className="space-y-2">
+                                                    <label className="text-sm font-medium capitalize">
+                                                        {key.replace("q", "Question ")}
+                                                    </label>
+                                                    <Input
+                                                        value={value}
+                                                        onChange={(e) => handleUpdate("listening", key, e.target.value)}
+                                                    />
+                                                </div>
+                                            )
+                                        })}
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="writing" className="mt-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {Object.entries(localKey.writing).map(([key, value]) => {
+                                        {sortKeys(Object.keys(localKey.writing)).map((key) => {
+                                            const value = localKey.writing[key];
                                             if (typeof value !== "string") return null;
                                             return (
                                                 <div key={key} className="space-y-2">
@@ -314,6 +343,7 @@ export const AdminPanel = () => {
                                 </TabsContent>
                             </Tabs>
                         </TabsContent>
+
                     </Tabs>
                 </div>
             </ScrollArea>

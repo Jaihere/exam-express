@@ -1,4 +1,4 @@
-import { BookOpen, Headphones, PenTool, Trophy, Menu } from "lucide-react";
+import { BookOpen, Headphones, PenTool, Trophy, Menu, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useExamStore } from "@/store/examStore";
 import { useUserStore } from "@/store/userStore";
@@ -11,7 +11,7 @@ const navItems = [
 ];
 
 export const ExamSidebar = () => {
-  const { currentSection, setSection, isSubmitted } = useExamStore();
+  const { currentSection, setSection, isSubmitted, examPdfUrl } = useExamStore();
   const { isAdmin, logout } = useUserStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -44,6 +44,23 @@ export const ExamSidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1">
+        {/* Exam PDF Link */}
+        {examPdfUrl && (
+          <div className="mb-4">
+            <button
+              onClick={() => window.open(examPdfUrl, "_blank")}
+              className={cn(
+                "flex items-center gap-2 w-full p-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20",
+                isCollapsed && "justify-center"
+              )}
+              title="View Question Paper"
+            >
+              <FileText className="h-4 w-4 flex-shrink-0" />
+              {!isCollapsed && <span className="text-sm font-medium animate-fade-in">Question Paper</span>}
+            </button>
+          </div>
+        )}
+
         <div className={cn("text-xs uppercase tracking-wider mb-3 px-3", isCollapsed && "hidden")}>
           Sections
         </div>
